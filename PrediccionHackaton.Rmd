@@ -1,0 +1,66 @@
+---
+title: "Hackaton"
+author: "Pedro Covelo"
+date: "2023-10-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+
+# Instalación y carga de paquetes necesarios
+install.packages(c("lubridate", "forecast", "readxl"))
+library(lubridate)
+library(forecast)
+library(readxl)
+
+# Cargamos biblioteca y tabla de excell
+install.packages("readxl")
+library(readxl)
+
+# Cargamos la tabla en RStudio
+tablaMensual <- read_excel("tablaMensual.xlsx")
+
+# Conversión de la columna "Mes" a formato de fecha
+meses <- c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+tablaMensual$Mes <- match(tablaMensual$Mes, meses)
+currentYear <- as.numeric(format(Sys.Date(), "%Y"))
+
+# Creación de una serie de tiempo con los kg comprados al proveedor
+compras_ts <- ts(tablaMensual$`Kg Comprados al Proveedor`, start = c(currentYear, 1), frequency = 12)
+
+# Modelo lineal para predecir el desperdicio basado en los kg comprados
+regressionModel <- lm(tablaMensual$`Kg Sobrantes` ~ tablaMensual$`Kg Comprados al Proveedor`)
+
+# Predicción del desperdicio
+predictedDesperdicio <- predict(regressionModel, newdata = data.frame(`tablaMensual$Kg Comprados al Proveedor` = tablaMensual$`Kg Comprados al Proveedor`))
+tablaMensual$PredictedKgSobrantes <- predictedDesperdicio
+
+# Ver los resultados
+tablaMensual
+
+
+
+
+
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
